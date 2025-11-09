@@ -13,28 +13,30 @@ st.set_page_config(page_title="OCULAIRE Glaucoma Detection", layout="wide")
 st.title("👁️ OCULAIRE: Glaucoma Detection Dashboard")
 
 # --- Model Loading (Cached) ---
+
 @st.cache_resource
 def load_bscan_model():
+    """Loads the Supervised B-Scan CNN model."""
     try:
+        # NOTE: Verify your H5 file name is correct here
         model = tf.keras.models.load_model("bscan_cnn.h5", compile=False)
         return model
     except Exception as e:
         st.error(f"Error loading B-Scan CNN model: {e}")
+        st.info("Please make sure 'bscan_cnn.h5' is in the current directory.")
         return None
 
-@st.cache_resource
-def load_rnflt_models():
+def load_rnflt_models_safe():
+    """Loads Unsupervised RNFLT artifacts safely."""
     try:
+        # Load all artifacts
         scaler = joblib.load("rnflt_scaler.joblib")
         kmeans = joblib.load("rnflt_kmeans.joblib")
         avg_healthy = np.load("avg_map_healthy.npy")
         avg_glaucoma = np.load("avg_map_glaucoma.npy")
         
-        # Re-create thin/thick logic from your notebook
-        # This assumes cluster 0 is thin (glaucoma) and cluster 1 is thick (healthy)
-        # You may need to adjust this logic based on your saved kmeans model
-        # A simple check:
-        if np.mean(avg_healthy) > np.mean(avg_glaucoma):
+        # Determine thin/thick cluster based on mean thickness
+        if np.nanmean(avg_healthy) > np.nanmean(avg_glaucoma):
             thick_cluster = 1
             thin_cluster = 0
         else:
@@ -53,10 +55,12 @@ def load_rnflt_models():
 def process_uploaded_npz(uploaded_file):
     """Loads NPZ file from Streamlit's uploader and extracts metrics."""
     try:
-        # Load NPZ from bytes
         file_bytes = io.BytesIO(uploaded_file.getvalue())
         npz = np.load(file_bytes, allow_pickle=True)
         rnflt_map = npz["volume"] if "volume" in npz else npz[npz.files[0]]
+        
+        if rnflt_map.ndim == 3:
+            rnflt_map = rnflt_map[0, :, :]
         
         vals = rnflt_map.flatten().astype(float)
         metrics = {
@@ -72,6 +76,9 @@ def process_uploaded_npz(uploaded_file):
 
 def compute_risk_map(rnflt_map, healthy_avg, threshold=-10):
     """Generates difference and risk maps."""
+    if rnflt_map.shape != healthy_avg.shape:
+         healthy_avg = cv2.resize(healthy_avg, (rnflt_map.shape[1], rnflt_map.shape[0]), interpolation=cv2.INTER_LINEAR)
+    
     diff = rnflt_map - healthy_avg
     risk = np.where(diff < threshold, diff, np.nan)
     
@@ -84,33 +91,18 @@ def compute_risk_map(rnflt_map, healthy_avg, threshold=-10):
 # 2. B-SCAN (PHASE S) HELPER FUNCTIONS
 # ==============================================================================
 def preprocess_bscan_image(image_pil, img_size=(224, 224)):
-    """
-    Replicates the *exact* preprocessing from your BscanDataGenerator.
-    Takes a PIL Image -> returns a processed numpy array for the model.
-    """
-    # Convert PIL to numpy array (grayscale)
+    """Preprocesses a PIL Image for the B-Scan model."""
     arr = np.array(image_pil.convert('L'))
-    
-    # 1. Clip to 99th percentile
     arr = np.clip(arr, 0, np.percentile(arr, 99))
-    
-    # 2. Min-Max Normalize
     arr = (arr - arr.min()) / (arr.max() - arr.min() + 1e-6)
-    
-    # 3. Resize (using OpenCV to match tf.image.resize)
     arr_resized = cv2.resize(arr, img_size, interpolation=cv2.INTER_NEAREST)
-    
-    # 4. Stack grayscale to 3-channel RGB
     arr_rgb = np.repeat(arr_resized[..., None], 3, axis=-1)
-    
-    # 5. Add batch dimension
     img_batch = np.expand_dims(arr_rgb, axis=0).astype(np.float32)
     return img_batch, arr_resized
 
 def make_gradcam_heatmap(img_array, model, last_conv_layer_name=None):
-    """Generates Grad-CAM heatmap (copied from your S2+ script)."""
+    """Generates Grad-CAM heatmap."""
     if last_conv_layer_name is None:
-        # Auto-detect last Conv2D layer
         for layer in reversed(model.layers):
             if isinstance(layer, (tf.keras.layers.Conv2D, tf.keras.layers.DepthwiseConv2D)):
                 last_conv_layer_name = layer.name
@@ -152,8 +144,8 @@ if "RNFLT" in analysis_type:
     # --- RNFLT ANALYSIS (PHASE D) ---
     st.header("RNFLT Map Analysis (Unsupervised)")
     
-    # Load models
-    scaler, kmeans, avg_healthy, avg_glaucoma, thin_cluster, thick_cluster = load_rnflt_models()
+    # Load models using the safe function
+    scaler, kmeans, avg_healthy, avg_glaucoma, thin_cluster, thick_cluster = load_rnflt_models_safe()
     
     if scaler is None:
         st.stop()
@@ -195,7 +187,7 @@ if "RNFLT" in analysis_type:
             axes[1].axis('off')
             plt.colorbar(im2, ax=axes[1], shrink=0.6, label="Δ Thickness (µm)")
             
-            im3 = axes[2].imshow(risk, cmap='hot')
+            im3 = axes[2].imshow(risk, cmap='hot') 
             axes[2].set_title("Risk Map (Thinner Zones)")
             axes[2].axis('off')
             plt.colorbar(im3, ax=axes[2], shrink=0.6, label="Δ Thickness (µm)")
@@ -221,7 +213,7 @@ elif "B-Scan" in analysis_type:
         img_batch, processed_img_display = preprocess_bscan_image(image_pil)
         
         # Run prediction
-        pred_raw = model.predict(img_batch)[0][0]
+        pred_raw = model.predict(img_batch, verbose=0)[0][0]
         label = "Glaucoma-like" if pred_raw > 0.5 else "Healthy-like"
         confidence = pred_raw * 100 if label == "Glaucoma-like" else (1 - pred_raw) * 100
         
@@ -232,15 +224,18 @@ elif "B-Scan" in analysis_type:
         st.subheader(f"🩺 Classification Result: **{label}** (Confidence: {confidence:.2f}%)")
         
         # Create overlay
-        heatmap = cv2.resize(heatmap, (224, 224))
-        heatmap = (heatmap * 255).astype(np.uint8)
-        heatmap_color = cv2.applyColorMap(heatmap, cv2.COLORMAP_JET)
-        
-        # Use the *processed* grayscale image for overlay
-        superimposed_img = (np.stack([processed_img_display]*3, axis=-1) * 255).astype(np.uint8)
-        superimposed_img = cv2.addWeighted(superimposed_img, 0.6, heatmap_color, 0.4, 0)
-        
-        col1, col2, col3 = st.columns(3)
-        col1.image(image_pil, caption="Original Uploaded Image", use_column_width=True)
-        col2.image(heatmap_color, caption="Grad-CAM Heatmap", use_column_width=True)
-        col3.image(superimposed_img, caption="Heatmap Overlay", use_column_width=True)
+        if heatmap is not None:
+            heatmap = cv2.resize(heatmap, (224, 224))
+            heatmap = (heatmap * 255).astype(np.uint8)
+            heatmap_color = cv2.applyColorMap(heatmap, cv2.COLORMAP_JET)
+            
+            superimposed_img = (np.stack([processed_img_display]*3, axis=-1) * 255).astype(np.uint8)
+            superimposed_img = cv2.addWeighted(superimposed_img, 0.6, heatmap_color, 0.4, 0)
+            
+            col1, col2, col3 = st.columns(3)
+            col1.image(image_pil, caption="Original Uploaded Image", use_column_width=True)
+            col2.image(heatmap_color, caption="Grad-CAM Heatmap", use_column_width=True)
+            col3.image(superimposed_img, caption="Heatmap Overlay", use_column_width=True)
+        else:
+            st.warning("Could not generate Grad-CAM visualization.")
+            st.image(image_pil, caption="Original Uploaded Image", use_column_width=False)
