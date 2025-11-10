@@ -1,5 +1,5 @@
 # app.py
-# OCULAIRE — Neon Lab v3 (centered header with tech-eye)
+# OCULAIRE — Neon Lab v3 with Landing Eye (click to go to dashboard)
 # Drop-in replacement. Keeps model/data filenames unchanged.
 
 import streamlit as st
@@ -34,7 +34,7 @@ plt.rcParams.update({
 })
 
 # -----------------------
-# CSS (neon theme + centered header + severity glow)
+# CSS: neon theme + centered eye + animation
 # -----------------------
 st.markdown(
     """
@@ -44,80 +44,108 @@ st.markdown(
       --bg:#020206; --panel:#071026; --neonA:#00f0ff; --neonB:#ff3ac2; --muted:#9fb1c9;
     }
     html, body, .stApp { background: radial-gradient(circle at 10% 10%, #07102a 0%, #020206 50%); color: #e6fbff; font-family: 'Plus Jakarta Sans', Inter, system-ui, -apple-system, Roboto, 'Helvetica Neue', Arial; }
-    /* existing neon theme */
+    .muted { color:var(--muted); }
+    /* Landing eye */
+    .landing {
+        display:flex; flex-direction:column; align-items:center; justify-content:center;
+        height:54vh; gap:12px; margin-bottom:18px;
+    }
+    .landing .tech-eye {
+        width:420px; max-width:86vw; height:auto; cursor:pointer;
+        filter: drop-shadow(0 12px 42px rgba(0,240,255,0.06)) drop-shadow(0 14px 64px rgba(255,58,194,0.04));
+        transition: transform 0.28s ease, filter 0.28s ease;
+        border-radius:16px;
+    }
+    .landing .tech-eye:hover { transform: translateY(-8px) scale(1.01); filter: drop-shadow(0 24px 80px rgba(0,240,255,0.12)) drop-shadow(0 24px 120px rgba(255,58,194,0.06)); }
+    .landing .title {
+        font-weight:900; font-size:44px; letter-spacing:2px;
+        background: linear-gradient(90deg, #00f0ff, #ff3ac2);
+        -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        text-shadow: 0 8px 36px rgba(0,0,0,0.6);
+    }
+    .landing .subtitle { color:var(--muted); margin-top:0; font-size:14px; }
+    .enter-btn {
+        margin-top:8px; padding:10px 18px; border-radius:12px;
+        background: linear-gradient(90deg,#00f0ff,#ff3ac2); color:#031116; font-weight:800; border:none; cursor:pointer;
+        box-shadow: 0 12px 32px rgba(0,240,255,0.08);
+    }
+
+    /* Dashboard styling re-used from Neon v2 */
     .rail { display:flex; flex-direction:column; gap:12px; padding-top:10px; }
     .rail .btn { width:56px; height:56px; border-radius:12px; display:flex; align-items:center; justify-content:center;
       background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); border:1px solid rgba(255,255,255,0.03); color:#e6fbff; font-weight:700; transition: transform 0.12s ease; }
     .hero { border-radius:12px; padding:16px; background: linear-gradient(180deg, rgba(255,255,255,0.016), rgba(255,255,255,0.01)); border:1px solid rgba(255,255,255,0.03); }
     .uploader { border-radius:12px; padding:12px; text-align:center; background: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.008)); border: 1px dashed rgba(255,255,255,0.03); }
-    .neon-btn { background: linear-gradient(90deg, var(--neonA), var(--neonB)); border:none; padding:10px 18px; border-radius:12px; color:#031116; font-weight:800; box-shadow: 0 8px 36px rgba(0,240,255,0.10), 0 6px 18px rgba(255,58,194,0.06); transition: transform 0.09s ease; }
     .kpi { border-radius:10px; padding:12px; background: linear-gradient(180deg, rgba(0,0,0,0.25), rgba(255,255,255,0.01)); border: 1px solid rgba(255,255,255,0.03); }
-    .kpi .label { color:var(--muted); font-size:12px; } .kpi .value { font-weight:800; font-size:20px; color:#fff; }
-    .muted { color:var(--muted); }
-    .severity-glow {
-      border-radius:8px; padding:6px 10px; display:inline-block; color:#011418; font-weight:800;
+    .severity-glow { border-radius:8px; padding:6px 10px; display:inline-block; color:#011418; font-weight:800;
       background: linear-gradient(90deg, rgba(0,240,255,0.85), rgba(255,58,194,0.85));
-      box-shadow: 0 0 18px rgba(0,240,255,0.18), 0 0 36px rgba(255,58,194,0.12);
-      animation: pulse 1.6s infinite;
-    }
-    @keyframes pulse {
-      0% { transform: scale(1); filter: drop-shadow(0 0 6px rgba(0,240,255,0.12)); }
-      50% { transform: scale(1.03); filter: drop-shadow(0 0 18px rgba(255,58,194,0.18)); }
-      100% { transform: scale(1); filter: drop-shadow(0 0 6px rgba(0,240,255,0.12)); }
-    }
-
-    /* --- CENTERED TECH HEADER --- */
-    .title-container {
-        display:flex;
-        flex-direction:column;
-        align-items:center;
-        justify-content:center;
-        text-align:center;
-        margin: 8px 0 18px 0;
-        padding: 6px 12px;
-        border-radius:12px;
-    }
-    .tech-eye {
-        width:72px;
-        height:72px;
-        margin-bottom:8px;
-        filter: drop-shadow(0 0 8px #00f0ff) drop-shadow(0 0 22px #ff3ac2);
-        border-radius:12px;
-        background: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.01));
-        padding:8px;
-    }
-    .glow-title {
-        font-family: 'Plus Jakarta Sans', Inter, system-ui, -apple-system;
-        font-weight:900;
-        font-size:36px;
-        line-height:1;
-        letter-spacing:2px;
-        background: linear-gradient(90deg, #00f0ff, #ff3ac2);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        text-shadow: 0 6px 26px rgba(107,92,255,0.06);
-        animation: glowPulse 3s ease-in-out infinite;
-    }
-    @keyframes glowPulse {
-        0% { filter: drop-shadow(0 0 6px #00f0ff); transform: translateY(0); }
-        50% { filter: drop-shadow(0 0 16px #ff3ac2); transform: translateY(-2px); }
-        100% { filter: drop-shadow(0 0 6px #00f0ff); transform: translateY(0); }
-    }
-    .subtitle {
-        color: var(--muted);
-        font-size:13px;
-        margin-top:4px;
-        letter-spacing:1px;
-    }
-
+      box-shadow: 0 0 18px rgba(0,240,255,0.18), 0 0 36px rgba(255,58,194,0.12); animation: pulse 1.6s infinite; }
     footer { visibility:hidden; }
     </style>
     """, unsafe_allow_html=True
 )
 
 # -----------------------
-# Helpers: load models, preprocess, compute maps
+# Utility: read query param / session state page
 # -----------------------
+def get_current_page():
+    params = st.experimental_get_query_params()
+    page = params.get("page", [None])[0]
+    # allow override by session_state for environments where query params are not respected
+    if "page" in st.session_state:
+        return st.session_state["page"]
+    return page or "landing"
+
+def go_to_dashboard():
+    # set query param (this will change browser URL)
+    st.experimental_set_query_params(page="dashboard")
+    st.session_state["page"] = "dashboard"
+
+def go_to_landing():
+    st.experimental_set_query_params()
+    st.session_state["page"] = "landing"
+
+# initialize session state
+if "page" not in st.session_state:
+    st.session_state["page"] = None
+
+page = get_current_page()
+
+# -----------------------
+# Landing screen (centered eye)
+# -----------------------
+if page != "dashboard":
+    # Show landing canvas with large eye + title
+    st.markdown(
+        f"""
+        <div class="landing">
+            <!-- clicking sets ?page=dashboard so Streamlit will reload with the dashboard -->
+            <img class="tech-eye" src="https://images.unsplash.com/photo-1556637642-6a5f6f6de7d4?q=80&w=1600&auto=format&fit=crop&ixlib=rb-4.0.3&s=2b6d1b2b6f8ae7b5a2d6bb4d6b1b8a5a"
+                 onclick="window.location.search='?page=dashboard'"
+                 alt="Tech Eye">
+            <div class="title">OCULAIRE</div>
+            <div class="subtitle">AI-Powered Glaucoma Detection Dashboard</div>
+            <button class="enter-btn" onclick="window.location.search='?page=dashboard'">Enter Dashboard</button>
+        </div>
+        """, unsafe_allow_html=True
+    )
+
+    # also provide a Streamlit fallback button (works without JS)
+    if st.button("Enter Dashboard (fallback)"):
+        go_to_dashboard()
+
+    # small explanation / credits
+    st.markdown("<div style='text-align:center;color:var(--muted);margin-top:8px'>Click / tap the eye to enter the dashboard.</div>", unsafe_allow_html=True)
+
+    # stop here to avoid loading heavy models until user enters dashboard
+    st.stop()
+
+# -----------------------
+# Dashboard page begins here
+# (everything below is the Neon Lab v3 dashboard you had previously)
+# -----------------------
+
+# Helpers: load models, preprocess, compute maps
 @st.cache_resource
 def load_bscan_model():
     try:
@@ -199,22 +227,17 @@ def fig_to_bytes(fig):
     return buf.getvalue()
 
 # -----------------------
-# CENTERED HEADER (tech eye + title)
+# Dashboard Header (small) — provide a way back to landing
 # -----------------------
-# You can replace the img src with a local file if you prefer to store the logo locally.
-st.markdown("""
-    <div class="title-container">
-        <img src="https://cdn-icons-png.flaticon.com/512/2920/2920244.png" class="tech-eye" alt="Tech Eye Icon">
-        <div class="glow-title">OCULAIRE</div>
-        <div class="subtitle">AI-Powered Glaucoma Detection Dashboard</div>
-    </div>
-""", unsafe_allow_html=True)
-
-# small spacer
-st.markdown("<div style='height:6px'></div>", unsafe_allow_html=True)
+top_bar_l, top_bar_r = st.columns([1, 6])
+with top_bar_l:
+    if st.button("← Back to Landing"):
+        go_to_landing()
+with top_bar_r:
+    st.markdown("<div style='text-align:right;color:var(--muted)'>OCULAIRE — Dashboard</div>", unsafe_allow_html=True)
 
 # -----------------------
-# UI layout: columns and placeholders
+# Dashboard main layout
 # -----------------------
 rail_col, canvas_col, right_col = st.columns([0.7, 5, 1.6], gap="large")
 
