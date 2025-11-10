@@ -1,7 +1,6 @@
 # app.py
-# OCULAIRE — Neon Lab v2 (updated): RNFLT captions + thumbnails + dynamic panel
-# Drop-in replacement. Keeps model/data filenames unchanged:
-# bscan_cnn.h5, rnflt_scaler.joblib, rnflt_kmeans.joblib, avg_map_healthy.npy, avg_map_glaucoma.npy
+# OCULAIRE — Neon Lab v3 (centered header with tech-eye)
+# Drop-in replacement. Keeps model/data filenames unchanged.
 
 import streamlit as st
 import numpy as np
@@ -12,7 +11,7 @@ from PIL import Image
 import io, time, base64, os, cv2
 from matplotlib.backends.backend_pdf import PdfPages
 
-# Try to import Plotly (optional interactive RNFLT)
+# Optional interactive RNFLT if plotly installed
 try:
     import plotly.express as px
     PLOTLY = True
@@ -22,7 +21,7 @@ except Exception:
 # -----------------------
 # Page config & plotting defaults
 # -----------------------
-st.set_page_config(page_title="OCULAIRE — Neon Lab v2 (updated)", layout="wide", page_icon="🧪")
+st.set_page_config(page_title="OCULAIRE — Neon Lab v3", layout="wide", page_icon="👁️")
 plt.style.use("dark_background")
 plt.rcParams.update({
     "figure.facecolor": "#04050a",
@@ -35,7 +34,7 @@ plt.rcParams.update({
 })
 
 # -----------------------
-# CSS (neon theme + severity glow)
+# CSS (neon theme + centered header + severity glow)
 # -----------------------
 st.markdown(
     """
@@ -45,10 +44,7 @@ st.markdown(
       --bg:#020206; --panel:#071026; --neonA:#00f0ff; --neonB:#ff3ac2; --muted:#9fb1c9;
     }
     html, body, .stApp { background: radial-gradient(circle at 10% 10%, #07102a 0%, #020206 50%); color: #e6fbff; font-family: 'Plus Jakarta Sans', Inter, system-ui, -apple-system, Roboto, 'Helvetica Neue', Arial; }
-    .header { display:flex; align-items:center; justify-content:space-between; padding:14px 18px; margin-bottom:14px; border-radius:12px;
-      background: linear-gradient(90deg, rgba(255,255,255,0.012), rgba(255,255,255,0.008)); border:1px solid rgba(255,255,255,0.03); }
-    .brand { font-weight:900; font-size:22px; color:#fff; }
-    .tagline { color:var(--muted); font-size:13px; }
+    /* existing neon theme */
     .rail { display:flex; flex-direction:column; gap:12px; padding-top:10px; }
     .rail .btn { width:56px; height:56px; border-radius:12px; display:flex; align-items:center; justify-content:center;
       background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); border:1px solid rgba(255,255,255,0.03); color:#e6fbff; font-weight:700; transition: transform 0.12s ease; }
@@ -69,6 +65,51 @@ st.markdown(
       50% { transform: scale(1.03); filter: drop-shadow(0 0 18px rgba(255,58,194,0.18)); }
       100% { transform: scale(1); filter: drop-shadow(0 0 6px rgba(0,240,255,0.12)); }
     }
+
+    /* --- CENTERED TECH HEADER --- */
+    .title-container {
+        display:flex;
+        flex-direction:column;
+        align-items:center;
+        justify-content:center;
+        text-align:center;
+        margin: 8px 0 18px 0;
+        padding: 6px 12px;
+        border-radius:12px;
+    }
+    .tech-eye {
+        width:72px;
+        height:72px;
+        margin-bottom:8px;
+        filter: drop-shadow(0 0 8px #00f0ff) drop-shadow(0 0 22px #ff3ac2);
+        border-radius:12px;
+        background: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.01));
+        padding:8px;
+    }
+    .glow-title {
+        font-family: 'Plus Jakarta Sans', Inter, system-ui, -apple-system;
+        font-weight:900;
+        font-size:36px;
+        line-height:1;
+        letter-spacing:2px;
+        background: linear-gradient(90deg, #00f0ff, #ff3ac2);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        text-shadow: 0 6px 26px rgba(107,92,255,0.06);
+        animation: glowPulse 3s ease-in-out infinite;
+    }
+    @keyframes glowPulse {
+        0% { filter: drop-shadow(0 0 6px #00f0ff); transform: translateY(0); }
+        50% { filter: drop-shadow(0 0 16px #ff3ac2); transform: translateY(-2px); }
+        100% { filter: drop-shadow(0 0 6px #00f0ff); transform: translateY(0); }
+    }
+    .subtitle {
+        color: var(--muted);
+        font-size:13px;
+        margin-top:4px;
+        letter-spacing:1px;
+    }
+
     footer { visibility:hidden; }
     </style>
     """, unsafe_allow_html=True
@@ -158,14 +199,23 @@ def fig_to_bytes(fig):
     return buf.getvalue()
 
 # -----------------------
-# UI layout: header + columns
+# CENTERED HEADER (tech eye + title)
 # -----------------------
-top_l, top_r = st.columns([1,3])
-with top_l:
-    st.markdown("<div class='header'><div style='display:flex;flex-direction:column;'><div class='brand'>OCULAIRE</div><div class='tagline'>Neon Lab — v2 (updated)</div></div></div>", unsafe_allow_html=True)
-with top_r:
-    st.markdown("<div style='text-align:right'><span class='muted'>Assistant edition — dynamic KPIs</span></div>", unsafe_allow_html=True)
+# You can replace the img src with a local file if you prefer to store the logo locally.
+st.markdown("""
+    <div class="title-container">
+        <img src="https://cdn-icons-png.flaticon.com/512/2920/2920244.png" class="tech-eye" alt="Tech Eye Icon">
+        <div class="glow-title">OCULAIRE</div>
+        <div class="subtitle">AI-Powered Glaucoma Detection Dashboard</div>
+    </div>
+""", unsafe_allow_html=True)
 
+# small spacer
+st.markdown("<div style='height:6px'></div>", unsafe_allow_html=True)
+
+# -----------------------
+# UI layout: columns and placeholders
+# -----------------------
 rail_col, canvas_col, right_col = st.columns([0.7, 5, 1.6], gap="large")
 
 # left rail icons
@@ -332,7 +382,6 @@ if predict:
                     try:
                         fig0 = px.imshow(rnflt_map, color_continuous_scale="Turbo", origin='lower')
                         fig0.update_layout(title={"text": plot_title_base, "x":0.5}, margin=dict(l=10,r=10,t=34,b=10))
-                        # per-trace colorbar config (Plotly's px.imshow creates a single trace)
                         fig0.update_traces(colorbar=dict(title="Thickness (µm)"))
 
                         fig1 = px.imshow(diff, color_continuous_scale="RdBu", origin='lower')
@@ -382,7 +431,6 @@ if predict:
     if severity_pct is not None:
         severity_bar_ph.markdown(f"<div style='display:flex;flex-direction:column;gap:6px'><div class='severity-glow'>{severity_pct:.1f}%</div></div>", unsafe_allow_html=True)
         sev_progress = min(max(severity_pct / 100.0, 0.0), 1.0)
-        # small progress widget shown below the chip inside right column
         st.progress(sev_progress)
     else:
         severity_bar_ph.markdown("<div class='muted'>—</div>", unsafe_allow_html=True)
@@ -423,14 +471,9 @@ if predict:
     if rnflt_fig is not None:
         if PLOTLY and isinstance(rnflt_fig, tuple):
             main_fig, fig_diff, fig_risk = rnflt_fig
-            # show interactive main RNFLT
             rnflt_display.plotly_chart(main_fig, use_container_width=True)
-            # thumbnails with captions below
             t0, t1, t2 = st.columns([1,1,1], gap="small")
             with t0:
-                # create a copy to set size and avoid mutating the main_fig state
-                small0 = main_fig.to_dict()
-                # plotly_chart will accept the figure object/dict
                 st.plotly_chart(main_fig.update_layout(height=240), use_container_width=True)
                 st.caption(f"Uploaded RNFLT Map — {label_r if label_r is not None else ''}")
             with t1:
@@ -440,9 +483,7 @@ if predict:
                 st.plotly_chart(fig_risk.update_layout(height=240), use_container_width=True)
                 st.caption("Risk Map (Thinner Zones)")
         else:
-            # Matplotlib 1x3 figure shown large
             rnflt_display.pyplot(rnflt_fig)
-            # below that, create labeled thumbnails from arrays
             try:
                 c0, c1, c2 = st.columns([1,1,1], gap="small")
                 with c0:
@@ -458,19 +499,18 @@ if predict:
                     plt.imshow(risk_map, cmap='hot'); plt.axis('off'); plt.title("Risk Map (Thinner Zones)", color='white')
                     st.pyplot(plt.gcf()); plt.close()
             except Exception:
-                # fallback: nothing else
                 pass
     else:
         rnflt_display.markdown("<div class='muted'>No RNFLT visualization (upload .npz)</div>", unsafe_allow_html=True)
 
-    # Grad-CAM display
+    # Grad-CAM
     if grad_img is not None:
         grad_display.image(grad_img, use_column_width=True, caption="Grad-CAM (B-scan)")
     else:
         grad_display.markdown("<div class='muted'>No Grad-CAM (need B-scan + model)</div>", unsafe_allow_html=True)
 
     # -----------------------
-    # Save small history entry and render textual recent history
+    # Save history, render small textual history
     # -----------------------
     hist_entry = {"time": time.strftime("%Y-%m-%d %H:%M:%S"), "status": status_text, "mean": rnflt_mean}
     st.session_state.history.insert(0, hist_entry)
@@ -490,7 +530,6 @@ if predict:
     if rnflt_fig is not None:
         try:
             if PLOTLY and isinstance(rnflt_fig, tuple):
-                # convert main Fig to PNG bytes
                 png_bytes = rnflt_fig[0].to_image(format="png")
             elif not PLOTLY:
                 png_bytes = fig_to_bytes(rnflt_fig)
@@ -506,7 +545,6 @@ if predict:
         pdf_buf = io.BytesIO()
         with PdfPages(pdf_buf) as pdf:
             if PLOTLY and isinstance(rnflt_fig, tuple):
-                # convert plotly to png and save
                 try:
                     img = rnflt_fig[0].to_image(format="png")
                     pil_img = Image.open(io.BytesIO(img))
@@ -515,7 +553,6 @@ if predict:
                 except Exception:
                     pass
             else:
-                # save the matplotlib rnflt_fig
                 try:
                     pdf.savefig(rnflt_fig, bbox_inches='tight', facecolor=rnflt_fig.get_facecolor())
                 except Exception:
@@ -532,7 +569,7 @@ if predict:
         st.markdown(f'<a href="data:application/pdf;base64,{b64pdf}" download="oculaire_report.pdf" class="muted">Download PDF Report</a>', unsafe_allow_html=True)
 
 # -----------------------
-# Render history when not predicting (persist display)
+# Show history when not predicting
 # -----------------------
 if not predict:
     lines = []
@@ -546,4 +583,5 @@ if not predict:
         hist_ph.markdown("<div style='color:var(--muted);font-size:12px'>No runs yet</div>", unsafe_allow_html=True)
 
 st.markdown("<div style='height:12px'></div>", unsafe_allow_html=True)
-st.markdown("<div style='text-align:center;color:var(--muted)'>OCULAIRE — Neon Lab v2 (updated). Research demo only; not for clinical use.</div>", unsafe_allow_html=True)
+st.markdown("<div style='text-align:center;color:var(--muted)'>OCULAIRE — Neon Lab v3. Research demo only; not for clinical use.</div>", unsafe_allow_html=True)
+
