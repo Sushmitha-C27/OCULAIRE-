@@ -1,5 +1,5 @@
 # app.py
-# OCULAIRE — Neon Lab v3 (centered header with tech-eye)
+# OCULAIRE — Neon Lab v3 (centered technical eye + immediate RNFLT captions)
 # Drop-in replacement. Keeps model/data filenames unchanged.
 
 import streamlit as st
@@ -34,84 +34,79 @@ plt.rcParams.update({
 })
 
 # -----------------------
-# CSS (neon theme + centered header + severity glow)
+# CSS (neon theme + centered technical eye)
 # -----------------------
 st.markdown(
     """
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;500;700;900&display=swap');
-    :root{
-      --bg:#020206; --panel:#071026; --neonA:#00f0ff; --neonB:#ff3ac2; --muted:#9fb1c9;
-    }
-    html, body, .stApp { background: radial-gradient(circle at 10% 10%, #07102a 0%, #020206 50%); color: #e6fbff; font-family: 'Plus Jakarta Sans', Inter, system-ui, -apple-system, Roboto, 'Helvetica Neue', Arial; }
-    /* existing neon theme */
-    .rail { display:flex; flex-direction:column; gap:12px; padding-top:10px; }
-    .rail .btn { width:56px; height:56px; border-radius:12px; display:flex; align-items:center; justify-content:center;
-      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); border:1px solid rgba(255,255,255,0.03); color:#e6fbff; font-weight:700; transition: transform 0.12s ease; }
+    :root{ --bg:#020206; --panel:#071026; --neonA:#00f0ff; --neonB:#ff3ac2; --muted:#9fb1c9; }
+    html, body, .stApp { background: radial-gradient(circle at 10% 10%, #07102a 0%, #020206 50%); color: #e6fbff; font-family: 'Plus Jakarta Sans', Inter, system-ui; }
+    .title-block { display:flex; flex-direction:column; align-items:center; gap:8px; margin:14px 0 18px 0; }
+    .tech-eye-svg { width:170px; height:auto; filter: drop-shadow(0 12px 40px rgba(0,240,255,0.08)); cursor:default; }
+    .brand-title { font-weight:900; font-size:36px; letter-spacing:2px;
+        background: linear-gradient(90deg, #00f0ff, #ff3ac2);
+        -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .brand-sub { color:var(--muted); font-size:13px; }
+    .muted { color:var(--muted); }
     .hero { border-radius:12px; padding:16px; background: linear-gradient(180deg, rgba(255,255,255,0.016), rgba(255,255,255,0.01)); border:1px solid rgba(255,255,255,0.03); }
     .uploader { border-radius:12px; padding:12px; text-align:center; background: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.008)); border: 1px dashed rgba(255,255,255,0.03); }
-    .neon-btn { background: linear-gradient(90deg, var(--neonA), var(--neonB)); border:none; padding:10px 18px; border-radius:12px; color:#031116; font-weight:800; box-shadow: 0 8px 36px rgba(0,240,255,0.10), 0 6px 18px rgba(255,58,194,0.06); transition: transform 0.09s ease; }
     .kpi { border-radius:10px; padding:12px; background: linear-gradient(180deg, rgba(0,0,0,0.25), rgba(255,255,255,0.01)); border: 1px solid rgba(255,255,255,0.03); }
-    .kpi .label { color:var(--muted); font-size:12px; } .kpi .value { font-weight:800; font-size:20px; color:#fff; }
-    .muted { color:var(--muted); }
-    .severity-glow {
-      border-radius:8px; padding:6px 10px; display:inline-block; color:#011418; font-weight:800;
-      background: linear-gradient(90deg, rgba(0,240,255,0.85), rgba(255,58,194,0.85));
-      box-shadow: 0 0 18px rgba(0,240,255,0.18), 0 0 36px rgba(255,58,194,0.12);
-      animation: pulse 1.6s infinite;
-    }
-    @keyframes pulse {
-      0% { transform: scale(1); filter: drop-shadow(0 0 6px rgba(0,240,255,0.12)); }
-      50% { transform: scale(1.03); filter: drop-shadow(0 0 18px rgba(255,58,194,0.18)); }
-      100% { transform: scale(1); filter: drop-shadow(0 0 6px rgba(0,240,255,0.12)); }
-    }
-
-    /* --- CENTERED TECH HEADER --- */
-    .title-container {
-        display:flex;
-        flex-direction:column;
-        align-items:center;
-        justify-content:center;
-        text-align:center;
-        margin: 8px 0 18px 0;
-        padding: 6px 12px;
-        border-radius:12px;
-    }
-    .tech-eye {
-        width:72px;
-        height:72px;
-        margin-bottom:8px;
-        filter: drop-shadow(0 0 8px #00f0ff) drop-shadow(0 0 22px #ff3ac2);
-        border-radius:12px;
-        background: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.01));
-        padding:8px;
-    }
-    .glow-title {
-        font-family: 'Plus Jakarta Sans', Inter, system-ui, -apple-system;
-        font-weight:900;
-        font-size:36px;
-        line-height:1;
-        letter-spacing:2px;
-        background: linear-gradient(90deg, #00f0ff, #ff3ac2);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        text-shadow: 0 6px 26px rgba(107,92,255,0.06);
-        animation: glowPulse 3s ease-in-out infinite;
-    }
-    @keyframes glowPulse {
-        0% { filter: drop-shadow(0 0 6px #00f0ff); transform: translateY(0); }
-        50% { filter: drop-shadow(0 0 16px #ff3ac2); transform: translateY(-2px); }
-        100% { filter: drop-shadow(0 0 6px #00f0ff); transform: translateY(0); }
-    }
-    .subtitle {
-        color: var(--muted);
-        font-size:13px;
-        margin-top:4px;
-        letter-spacing:1px;
-    }
-
     footer { visibility:hidden; }
+    .large-title { font-size:28px; font-weight:900; margin-bottom:8px; }
+    .thumb-caption { text-align:center; color:var(--muted); font-size:13px; margin-top:6px; }
     </style>
+    """, unsafe_allow_html=True
+)
+
+# -----------------------
+# Technical eye SVG header (centered)
+# -----------------------
+# Inline SVG gives crisp, scalable tech-eye. Replace colors if needed.
+st.markdown(
+    """
+    <div class="title-block">
+      <!-- clickable could be added, but this is static dashboard header -->
+      <svg class="tech-eye-svg" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <radialGradient id="g1" cx="50%" cy="40%">
+            <stop offset="0%" stop-color="#66f0ff" stop-opacity="1"/>
+            <stop offset="60%" stop-color="#5a7fff" stop-opacity="0.9"/>
+            <stop offset="100%" stop-color="#2f0f3a" stop-opacity="0.3"/>
+          </radialGradient>
+          <linearGradient id="g2" x1="0" x2="1">
+            <stop offset="0" stop-color="#00f0ff"/>
+            <stop offset="1" stop-color="#ff3ac2"/>
+          </linearGradient>
+          <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="6" result="coloredBlur"/>
+            <feMerge>
+              <feMergeNode in="coloredBlur"/>
+              <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+          </filter>
+        </defs>
+
+        <!-- outer eyelid ring -->
+        <path d="M32 256 C96 112, 416 112, 480 256 C416 400, 96 400, 32 256 Z"
+              fill="url(#g1)" stroke="url(#g2)" stroke-width="6" filter="url(#glow)" opacity="0.98"/>
+        <!-- iris network -->
+        <g transform="translate(256,256)">
+          <circle r="80" fill="#03161b" />
+          <circle r="66" fill="url(#g2)" opacity="0.12" />
+          <!-- tech mesh -->
+          <g stroke="#7ee9ff" stroke-opacity="0.12" stroke-width="1">
+            <path d="M-50,-10 L50,10 M-30,-50 L30,50 M-60,0 L60,0 M-10,-60 L10,60" />
+          </g>
+          <!-- pupil -->
+          <circle r="30" fill="#001118" stroke="#66f0ff" stroke-opacity="0.22" stroke-width="2"/>
+          <circle r="10" cx="-8" cy="-6" fill="#bff8ff" opacity="0.9"/>
+        </g>
+      </svg>
+
+      <div class="brand-title">OCULAIRE</div>
+      <div class="brand-sub">AI-Powered Glaucoma Detection Dashboard</div>
+    </div>
     """, unsafe_allow_html=True
 )
 
@@ -199,35 +194,14 @@ def fig_to_bytes(fig):
     return buf.getvalue()
 
 # -----------------------
-# CENTERED HEADER (tech eye + title)
-# -----------------------
-# You can replace the img src with a local file if you prefer to store the logo locally.
-st.markdown("""
-    <div class="title-container">
-        <img src="https://cdn-icons-png.flaticon.com/512/2920/2920244.png" class="tech-eye" alt="Tech Eye Icon">
-        <div class="glow-title">OCULAIRE</div>
-        <div class="subtitle">AI-Powered Glaucoma Detection Dashboard</div>
-    </div>
-""", unsafe_allow_html=True)
-
-# small spacer
-st.markdown("<div style='height:6px'></div>", unsafe_allow_html=True)
-
-# -----------------------
-# UI layout: columns and placeholders
+# Layout: uploaders + visuals (main area)
 # -----------------------
 rail_col, canvas_col, right_col = st.columns([0.7, 5, 1.6], gap="large")
 
-# left rail icons
 with rail_col:
-    st.markdown("<div class='rail'>", unsafe_allow_html=True)
-    st.markdown("<div class='btn'>🏠</div>", unsafe_allow_html=True)
-    st.markdown("<div class='btn'>⬆️</div>", unsafe_allow_html=True)
-    st.markdown("<div class='btn'>▶️</div>", unsafe_allow_html=True)
-    st.markdown("<div class='btn'>📜</div>", unsafe_allow_html=True)
-    st.markdown("</div>", unsafe_allow_html=True)
+    st.markdown("<div class='muted' style='padding-top:10px; text-align:center'>◼︎</div>", unsafe_allow_html=True)
+    st.markdown("<div style='height:8px'></div>", unsafe_allow_html=True)
 
-# center hero: uploaders and visual placeholders
 with canvas_col:
     st.markdown("<div class='hero'>", unsafe_allow_html=True)
     st.markdown("<div style='display:flex;justify-content:space-between;align-items:center'><div style='font-weight:800;font-size:18px'>Neon Lab Canvas</div><div class='muted tiny'>Futuristic visuals · dynamic panel</div></div>", unsafe_allow_html=True)
@@ -253,23 +227,24 @@ with canvas_col:
 
     st.markdown("<div style='height:18px'></div>", unsafe_allow_html=True)
 
+    # Placeholders for the big RNFLT area and Grad-CAM next to each other
     viz_left, viz_right = st.columns([2.6, 2.4], gap="large")
     with viz_left:
-        st.markdown("<div class='kpi' style='height:420px;display:flex;flex-direction:column'>", unsafe_allow_html=True)
-        st.markdown("<div style='font-weight:700'>RNFLT Visual</div>", unsafe_allow_html=True)
+        # big RNFLT visual area (main figure will appear here immediately after prediction)
+        st.markdown("<div class='kpi' style='min-height:420px; display:flex; flex-direction:column; padding:18px;'>", unsafe_allow_html=True)
+        st.markdown("<div class='large-title'>RNFLT Visual</div>", unsafe_allow_html=True)
         rnflt_display = st.empty()
-        st.markdown("<div style='flex:1'></div>", unsafe_allow_html=True)
+        # small area reserved for thumbnails (will be filled immediately after main fig)
+        thumb_area = st.empty()
         st.markdown("</div>", unsafe_allow_html=True)
     with viz_right:
-        st.markdown("<div class='kpi' style='height:420px;display:flex;flex-direction:column'>", unsafe_allow_html=True)
-        st.markdown("<div style='font-weight:700'>Grad-CAM</div>", unsafe_allow_html=True)
+        st.markdown("<div class='kpi' style='min-height:420px; display:flex; flex-direction:column; padding:18px;'>", unsafe_allow_html=True)
+        st.markdown("<div class='large-title'>Grad-CAM</div>", unsafe_allow_html=True)
         grad_display = st.empty()
-        st.markdown("<div style='flex:1'></div>", unsafe_allow_html=True)
         st.markdown("</div>", unsafe_allow_html=True)
 
     st.markdown("</div>", unsafe_allow_html=True)  # end hero
 
-# right column placeholders
 with right_col:
     st.markdown("<div class='kpi' style='padding:14px'>", unsafe_allow_html=True)
     st.markdown("<div style='font-weight:700'>Overview</div>", unsafe_allow_html=True)
@@ -295,34 +270,43 @@ with right_col:
 # Load models & artifacts (cached)
 # -----------------------
 with st.spinner("Loading models and artifacts (if available)..."):
-    b_model = load_bscan_model()
-    scaler, kmeans, avg_healthy, avg_glaucoma, thin_cluster, thick_cluster = load_rnflt_artifacts()
+    @st.cache_resource
+    def _load_b():
+        try:
+            return tf.keras.models.load_model("bscan_cnn.h5", compile=False)
+        except Exception:
+            return None
+    b_model = _load_b()
+
+    @st.cache_resource
+    def _load_rn():
+        try:
+            scaler = joblib.load("rnflt_scaler.joblib")
+            kmeans = joblib.load("rnflt_kmeans.joblib")
+            avg_healthy = np.load("avg_map_healthy.npy")
+            avg_glaucoma = np.load("avg_map_glaucoma.npy")
+            thick_cluster, thin_cluster = (1,0) if np.nanmean(avg_healthy) > np.nanmean(avg_glaucoma) else (0,1)
+            return scaler, kmeans, avg_healthy, avg_glaucoma, thin_cluster, thick_cluster
+        except Exception:
+            return None, None, None, None, None, None
+    scaler, kmeans, avg_healthy, avg_glaucoma, thin_cluster, thick_cluster = _load_rn()
 time.sleep(0.12)
 
-# ensure session history exists
 if "history" not in st.session_state:
     st.session_state.history = []
 
 # -----------------------
-# Predict logic (update placeholders in-place)
+# Predict (main)
 # -----------------------
 if predict:
-    # initial result containers
-    status_text = "No result"
-    severity_pct = None
-    risk_mean = None
-    rnflt_mean = None
-    grad_img = None
-    rnflt_fig = None
-    label_r = None
+    status_text = "No result"; severity_pct = None; risk_mean = None; rnflt_mean = None
+    grad_img = None; rnflt_fig = None; label_r = None
 
-    prog = st.progress(0)
-    step = 0
+    prog = st.progress(0); step = 0
 
     # B-scan branch
     if bscan_file is not None and b_model is not None:
-        step += 1
-        prog.progress(int(100 * step / 4))
+        step += 1; prog.progress(int(100 * step / 4))
         try:
             pil = Image.open(bscan_file).convert("L")
             batch, proc = preprocess_bscan_image(pil)
@@ -331,7 +315,6 @@ if predict:
             confidence = pred_raw if pred_raw > 0.5 else (1 - pred_raw)
             status_text = label
             severity_pct = float(confidence * 100)
-            # Grad-CAM
             heat = compute_gradcam(batch, b_model)
             if heat is not None:
                 heat_r = cv2.resize(heat, (224,224))
@@ -345,38 +328,30 @@ if predict:
 
     # RNFLT branch
     if rnflt_file is not None and scaler is not None and kmeans is not None and avg_healthy is not None:
-        step += 1
-        prog.progress(int(100 * step / 4))
+        step += 1; prog.progress(int(100 * step / 4))
         try:
             rnflt_map = read_npz(rnflt_file)
             if rnflt_map is not None:
                 vals = rnflt_map.flatten().astype(float)
-                rnflt_mean = float(np.nanmean(vals))
-                rnflt_std = float(np.nanstd(vals))
+                rnflt_mean = float(np.nanmean(vals)); rnflt_std = float(np.nanstd(vals))
                 mn = float(np.nanmin(vals)); mx = float(np.nanmax(vals))
                 X_new = np.array([[rnflt_mean, rnflt_std, mn, mx]])
                 Xs = scaler.transform(X_new)
                 cluster = int(kmeans.predict(Xs)[0])
                 label_r = "Glaucoma-like" if cluster == thin_cluster else "Healthy-like"
-                if status_text == "No result":
-                    status_text = label_r
-                else:
-                    status_text = f"{status_text} + {label_r}"
+                if status_text == "No result": status_text = label_r
+                else: status_text = f"{status_text} + {label_r}"
 
-                # compute diff / risk / severity
                 diff, risk_map, severity_calc = compute_risk_map(rnflt_map, avg_healthy, threshold=-threshold)
-                if severity_pct is None:
-                    severity_pct = float(severity_calc)
+                if severity_pct is None: severity_pct = float(severity_calc)
                 risk_mean = float(np.nanmean(np.nan_to_num(risk_map))) if np.isfinite(risk_map).any() else 0.0
 
-                # compute quadrants (simple approximations)
                 h, w = rnflt_map.shape
                 sup = float(np.nanmean(rnflt_map[:h//2, :])) if h>1 else np.nan
                 inf = float(np.nanmean(rnflt_map[h//2:, :])) if h>1 else np.nan
                 temp = float(np.nanmean(rnflt_map[:, :w//3])) if w>2 else np.nan
 
-                # --- Build RNFLT figures with titles (Plotly or Matplotlib) ---
-                plot_title_base = f"Uploaded RNFLT Map ({label_r})" if label_r is not None else "Uploaded RNFLT Map"
+                plot_title_base = f"Uploaded RNFLT Map — {label_r}" if label_r is not None else "Uploaded RNFLT Map"
 
                 if PLOTLY:
                     try:
@@ -396,108 +371,75 @@ if predict:
                     except Exception:
                         rnflt_fig = None
                 else:
-                    fig, axes = plt.subplots(1, 3, figsize=(14,5), constrained_layout=True)
+                    fig, axes = plt.subplots(1, 3, figsize=(15,6), constrained_layout=True)
                     im0 = axes[0].imshow(rnflt_map, cmap='turbo')
-                    axes[0].set_title(plot_title_base)
+                    axes[0].set_title(plot_title_base, fontsize=18, color='white')
                     axes[0].axis('off')
-                    c0 = plt.colorbar(im0, ax=axes[0], fraction=0.045, pad=0.02)
-                    c0.set_label("Thickness (µm)"); c0.ax.yaxis.set_tick_params(color='#e6fbff'); c0.outline.set_edgecolor('#e6fbff')
+                    c0 = plt.colorbar(im0, ax=axes[0], fraction=0.045, pad=0.02); c0.set_label("Thickness (µm)")
 
                     im1 = axes[1].imshow(diff, cmap='bwr', vmin=-30, vmax=30)
-                    axes[1].set_title("Difference Map (vs. Healthy)"); axes[1].axis('off')
+                    axes[1].set_title("Difference Map (vs. Healthy)", fontsize=18, color='white'); axes[1].axis('off')
                     c1 = plt.colorbar(im1, ax=axes[1], fraction=0.045, pad=0.02); c1.set_label("Δ Thickness (µm)")
 
                     im2 = axes[2].imshow(risk_map, cmap='hot')
-                    axes[2].set_title("Risk Map (Thinner Zones)"); axes[2].axis('off')
+                    axes[2].set_title("Risk Map (Thinner Zones)", fontsize=18, color='white'); axes[2].axis('off')
                     c2 = plt.colorbar(im2, ax=axes[2], fraction=0.045, pad=0.02); c2.set_label("Δ Thickness (µm)")
 
                     fig.patch.set_facecolor("#04050a")
-                    for ax in axes:
-                        ax.set_facecolor("#04050a")
+                    for ax in axes: ax.set_facecolor("#04050a")
                     rnflt_fig = fig
         except Exception as e:
             st.error(f"RNFLT processing error: {e}")
 
-    prog.progress(100)
-    time.sleep(0.12)
-    prog.empty()
+    prog.progress(100); time.sleep(0.08); prog.empty()
 
-    # -----------------------
-    # Update right-hand placeholders in-place (no rerun)
-    # -----------------------
+    # Update right-hand placeholders
     status_ph.markdown(f"<div style='font-weight:800;font-size:14px'>{status_text}</div>", unsafe_allow_html=True)
-
-    # Severity display (glow chip + progress)
     if severity_pct is not None:
-        severity_bar_ph.markdown(f"<div style='display:flex;flex-direction:column;gap:6px'><div class='severity-glow'>{severity_pct:.1f}%</div></div>", unsafe_allow_html=True)
-        sev_progress = min(max(severity_pct / 100.0, 0.0), 1.0)
-        st.progress(sev_progress)
+        severity_bar_ph.markdown(f"<div style='font-weight:800;color:#ffffff'>{severity_pct:.1f}%</div>", unsafe_allow_html=True)
+        st.progress(min(max(severity_pct/100.0,0),1))
     else:
         severity_bar_ph.markdown("<div class='muted'>—</div>", unsafe_allow_html=True)
+    risk_ph.markdown(f"<div style='font-weight:700'>{risk_mean:.2f}</div>" if risk_mean is not None else "<div class='muted'>—</div>", unsafe_allow_html=True)
+    mean_ph.markdown(f"<div class='muted'>Mean RNFLT</div><div style='font-weight:800'>{rnflt_mean:.2f} µm</div>" if rnflt_mean is not None else "<div class='muted'>Mean RNFLT: —</div>", unsafe_allow_html=True)
 
-    # Risk mean
-    if risk_mean is not None:
-        risk_ph.markdown(f"<div style='font-weight:700'>{risk_mean:.2f}</div>", unsafe_allow_html=True)
-    else:
-        risk_ph.markdown("<div class='muted'>—</div>", unsafe_allow_html=True)
+    sup_ph.markdown(f"<div class='muted'>Superior</div><div style='font-weight:700'>{sup:.2f}</div>" if 'sup' in locals() else "<div class='muted'>Superior —</div>", unsafe_allow_html=True)
+    inf_ph.markdown(f"<div class='muted'>Inferior</div><div style='font-weight:700'>{inf:.2f}</div>" if 'inf' in locals() else "<div class='muted'>Inferior —</div>", unsafe_allow_html=True)
+    temp_ph.markdown(f"<div class='muted'>Temporal</div><div style='font-weight:700'>{temp:.2f}</div>" if 'temp' in locals() else "<div class='muted'>Temporal —</div>", unsafe_allow_html=True)
 
-    # RNFLT quadrant & mean stats
-    if rnflt_mean is not None:
-        mean_ph.markdown(f"<div class='label muted'>Mean RNFLT</div><div style='font-weight:800'>{rnflt_mean:.2f} µm</div>", unsafe_allow_html=True)
-    else:
-        mean_ph.markdown("<div class='muted'>Mean RNFLT: —</div>", unsafe_allow_html=True)
-
-    # safe display for quadrant numbers
-    try:
-        sup_val = sup if 'sup' in locals() else None
-        inf_val = inf if 'inf' in locals() else None
-        temp_val = temp if 'temp' in locals() else None
-
-        sup_text = f"{sup_val:.2f}" if (sup_val is not None and not np.isnan(sup_val)) else "—"
-        inf_text = f"{inf_val:.2f}" if (inf_val is not None and not np.isnan(inf_val)) else "—"
-        temp_text = f"{temp_val:.2f}" if (temp_val is not None and not np.isnan(temp_val)) else "—"
-
-        sup_ph.markdown(f"<div class='label muted'>Superior</div><div style='font-weight:700'>{sup_text}</div>", unsafe_allow_html=True)
-        inf_ph.markdown(f"<div class='label muted'>Inferior</div><div style='font-weight:700'>{inf_text}</div>", unsafe_allow_html=True)
-        temp_ph.markdown(f"<div class='label muted'>Temporal</div><div style='font-weight:700'>{temp_text}</div>", unsafe_allow_html=True)
-    except Exception:
-        sup_ph.markdown("<div class='muted'>Superior: —</div>", unsafe_allow_html=True)
-        inf_ph.markdown("<div class='muted'>Inferior: —</div>", unsafe_allow_html=True)
-        temp_ph.markdown("<div class='muted'>Temporal: —</div>", unsafe_allow_html=True)
-
-    # -----------------------
-    # Render RNFLT visuals + labeled thumbnails
-    # -----------------------
+    # Render RNFLT visuals immediately under the main RNFLT container
     if rnflt_fig is not None:
         if PLOTLY and isinstance(rnflt_fig, tuple):
             main_fig, fig_diff, fig_risk = rnflt_fig
-            rnflt_display.plotly_chart(main_fig, use_container_width=True)
-            t0, t1, t2 = st.columns([1,1,1], gap="small")
-            with t0:
-                st.plotly_chart(main_fig.update_layout(height=240), use_container_width=True)
-                st.caption(f"Uploaded RNFLT Map — {label_r if label_r is not None else ''}")
-            with t1:
-                st.plotly_chart(fig_diff.update_layout(height=240), use_container_width=True)
-                st.caption("Difference Map (vs. Healthy)")
-            with t2:
-                st.plotly_chart(fig_risk.update_layout(height=240), use_container_width=True)
-                st.caption("Risk Map (Thinner Zones)")
+            rnflt_display.plotly_chart(main_fig.update_layout(height=520), use_container_width=True)
+            # thumbnails under main
+            cols = thumb_area.columns([1,1,1], gap="small")
+            with cols[0]:
+                st.plotly_chart(main_fig.update_layout(height=260), use_container_width=True)
+                st.markdown("<div class='thumb-caption'>Uploaded RNFLT Map — {}</div>".format(label_r), unsafe_allow_html=True)
+            with cols[1]:
+                st.plotly_chart(fig_diff.update_layout(height=260), use_container_width=True)
+                st.markdown("<div class='thumb-caption'>Difference Map (vs. Healthy)</div>", unsafe_allow_html=True)
+            with cols[2]:
+                st.plotly_chart(fig_risk.update_layout(height=260), use_container_width=True)
+                st.markdown("<div class='thumb-caption'>Risk Map (Thinner Zones)</div>", unsafe_allow_html=True)
         else:
+            # Matplotlib large 1x3 figure
             rnflt_display.pyplot(rnflt_fig)
             try:
-                c0, c1, c2 = st.columns([1,1,1], gap="small")
+                c0, c1, c2 = thumb_area.columns([1,1,1], gap="small")
                 with c0:
-                    plt.figure(figsize=(3,3))
-                    plt.imshow(rnflt_map, cmap='turbo'); plt.axis('off'); plt.title(f"Uploaded RNFLT Map — {label_r if label_r is not None else ''}", color='white')
-                    st.pyplot(plt.gcf()); plt.close()
+                    figa, axa = plt.subplots(figsize=(3,3)); axa.imshow(rnflt_map, cmap='turbo'); axa.axis('off'); plt.tight_layout()
+                    st.pyplot(figa); plt.close(figa)
+                    st.markdown(f"<div class='thumb-caption'>Uploaded RNFLT Map — {label_r}</div>", unsafe_allow_html=True)
                 with c1:
-                    plt.figure(figsize=(3,3))
-                    plt.imshow(diff, cmap='bwr', vmin=-30, vmax=30); plt.axis('off'); plt.title("Difference Map (vs. Healthy)", color='white')
-                    st.pyplot(plt.gcf()); plt.close()
+                    figb, axb = plt.subplots(figsize=(3,3)); axb.imshow(diff, cmap='bwr', vmin=-30, vmax=30); axb.axis('off'); plt.tight_layout()
+                    st.pyplot(figb); plt.close(figb)
+                    st.markdown("<div class='thumb-caption'>Difference Map (vs. Healthy)</div>", unsafe_allow_html=True)
                 with c2:
-                    plt.figure(figsize=(3,3))
-                    plt.imshow(risk_map, cmap='hot'); plt.axis('off'); plt.title("Risk Map (Thinner Zones)", color='white')
-                    st.pyplot(plt.gcf()); plt.close()
+                    figc, axc = plt.subplots(figsize=(3,3)); axc.imshow(risk_map, cmap='hot'); axc.axis('off'); plt.tight_layout()
+                    st.pyplot(figc); plt.close(figc)
+                    st.markdown("<div class='thumb-caption'>Risk Map (Thinner Zones)</div>", unsafe_allow_html=True)
             except Exception:
                 pass
     else:
@@ -509,14 +451,10 @@ if predict:
     else:
         grad_display.markdown("<div class='muted'>No Grad-CAM (need B-scan + model)</div>", unsafe_allow_html=True)
 
-    # -----------------------
-    # Save history, render small textual history
-    # -----------------------
+    # history
     hist_entry = {"time": time.strftime("%Y-%m-%d %H:%M:%S"), "status": status_text, "mean": rnflt_mean}
     st.session_state.history.insert(0, hist_entry)
-    if len(st.session_state.history) > 20:
-        st.session_state.history = st.session_state.history[:20]
-
+    if len(st.session_state.history) > 20: st.session_state.history = st.session_state.history[:20]
     lines = []
     for e in st.session_state.history[:6]:
         t = e.get("time", ""); s = e.get("status", "—"); m = e.get("mean", None)
@@ -524,52 +462,36 @@ if predict:
         lines.append(f"{t} — {s} — mean:{mstr}")
     hist_ph.markdown("<br>".join([f"<div style='color:var(--muted);font-size:12px'>{l}</div>" for l in lines]), unsafe_allow_html=True)
 
-    # -----------------------
-    # Downloads: RNFLT PNG + PDF (if available)
-    # -----------------------
+    # downloads (png/pdf)
     if rnflt_fig is not None:
         try:
             if PLOTLY and isinstance(rnflt_fig, tuple):
                 png_bytes = rnflt_fig[0].to_image(format="png")
-            elif not PLOTLY:
-                png_bytes = fig_to_bytes(rnflt_fig)
             else:
-                png_bytes = None
+                png_bytes = fig_to_bytes(rnflt_fig)
             if png_bytes:
                 b64 = base64.b64encode(png_bytes).decode()
                 st.markdown(f'<a href="data:file/png;base64,{b64}" download="rnflt_visual.png" class="muted">Download RNFLT PNG</a>', unsafe_allow_html=True)
         except Exception:
             pass
 
-    if rnflt_fig is not None:
         pdf_buf = io.BytesIO()
         with PdfPages(pdf_buf) as pdf:
-            if PLOTLY and isinstance(rnflt_fig, tuple):
-                try:
+            try:
+                if not PLOTLY:
+                    pdf.savefig(rnflt_fig, bbox_inches='tight', facecolor=rnflt_fig.get_facecolor())
+                else:
                     img = rnflt_fig[0].to_image(format="png")
                     pil_img = Image.open(io.BytesIO(img))
-                    fig2, ax2 = plt.subplots(figsize=(6,6)); ax2.imshow(pil_img); ax2.axis('off'); fig2.patch.set_facecolor("#04050a")
-                    pdf.savefig(fig2, bbox_inches='tight', facecolor=fig2.get_facecolor()); plt.close(fig2)
-                except Exception:
-                    pass
-            else:
-                try:
-                    pdf.savefig(rnflt_fig, bbox_inches='tight', facecolor=rnflt_fig.get_facecolor())
-                except Exception:
-                    pass
-            if grad_img is not None:
-                try:
-                    pilg = Image.fromarray(grad_img)
-                    fig3, ax3 = plt.subplots(figsize=(6,6)); ax3.imshow(pilg); ax3.axis('off'); fig3.patch.set_facecolor("#04050a")
-                    pdf.savefig(fig3, bbox_inches='tight', facecolor=fig3.get_facecolor()); plt.close(fig3)
-                except Exception:
-                    pass
+                    fig2, ax2 = plt.subplots(figsize=(6,6)); ax2.imshow(pil_img); ax2.axis('off'); pdf.savefig(fig2, bbox_inches='tight'); plt.close(fig2)
+            except Exception:
+                pass
         pdf_buf.seek(0)
         b64pdf = base64.b64encode(pdf_buf.read()).decode()
         st.markdown(f'<a href="data:application/pdf;base64,{b64pdf}" download="oculaire_report.pdf" class="muted">Download PDF Report</a>', unsafe_allow_html=True)
 
 # -----------------------
-# Show history when not predicting
+# If not predicting, show history summary on the right
 # -----------------------
 if not predict:
     lines = []
@@ -580,7 +502,8 @@ if not predict:
     if lines:
         hist_ph.markdown("<br>".join([f"<div style='color:var(--muted);font-size:12px'>{l}</div>" for l in lines]), unsafe_allow_html=True)
     else:
-        hist_ph.markdown("<div style='color:var(--muted);font-size:12px'>No runs yet</div>", unsafe_allow_html=True)
+        hist_ph.markdown("<div class='muted'>No runs yet</div>", unsafe_allow_html=True)
 
 st.markdown("<div style='height:12px'></div>", unsafe_allow_html=True)
 st.markdown("<div style='text-align:center;color:var(--muted)'>OCULAIRE — Neon Lab v3. Research demo only; not for clinical use.</div>", unsafe_allow_html=True)
+
