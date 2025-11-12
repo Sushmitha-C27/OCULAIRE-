@@ -43,7 +43,7 @@ st.markdown(
     :root{ --bg:#020206; --panel:#071026; --neonA:#00f0ff; --neonB:#ff3ac2; --muted:#9fb1c9; }
     html, body, .stApp { background: radial-gradient(circle at 10% 10%, #07102a 0%, #020206 50%); color: #e6fbff; font-family: 'Plus Jakarta Sans', Inter, system-ui; }
     .title-block { display:flex; flex-direction:column; align-items:center; gap:8px; margin:14px 0 18px 0; }
-    .tech-eye-svg { width:170px; height:auto; filter: drop-shadow(0 12px 40px rgba(0,240,255,0.08)); cursor:pointer; }
+    .tech-eye-svg { width:170px; height:auto; filter: drop-shadow(0 12px 40px rgba(0,240,255,0.08)); cursor:default; }
     .brand-title { font-weight:900; font-size:36px; letter-spacing:2px;
         background: linear-gradient(90deg, #00f0ff, #ff3ac2);
         -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
@@ -62,79 +62,62 @@ st.markdown(
 # -----------------------
 # Technical eye SVG header (centered)
 # -----------------------
-header_html = """
-<div class="title-block">
-  <svg onclick="window.location.search='?page=dashboard'"
-       class="tech-eye-svg"
-       viewBox="0 0 512 512"
-       xmlns="http://www.w3.org/2000/svg"
-       role="img"
-       aria-label="OCULAIRE tech eye (click to open dashboard)"
-       style="max-width:420px; width:100%; height:auto;">
-    <defs>
-      <radialGradient id="g1" cx="50%" cy="40%">
-        <stop offset="0%" stop-color="#66f0ff" stop-opacity="1"/>
-        <stop offset="60%" stop-color="#5a7fff" stop-opacity="0.9"/>
-        <stop offset="100%" stop-color="#2f0f3a" stop-opacity="0.3"/>
-      </radialGradient>
-      <linearGradient id="g2" x1="0" x2="1">
-        <stop offset="0" stop-color="#00f0ff"/>
-        <stop offset="1" stop-color="#ff3ac2"/>
-      </linearGradient>
-      <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
-        <feGaussianBlur stdDeviation="6" result="coloredBlur"/>
-        <feMerge>
-          <feMergeNode in="coloredBlur"/>
-          <feMergeNode in="SourceGraphic"/>
-        </feMerge>
-      </filter>
-    </defs>
+# Inline SVG gives crisp, scalable tech-eye. Replace colors if needed.
+st.markdown(
+    """
+    <div class="title-block">
+      <!-- clickable could be added, but this is static dashboard header -->
+      <svg class="tech-eye-svg" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <radialGradient id="g1" cx="50%" cy="40%">
+            <stop offset="0%" stop-color="#66f0ff" stop-opacity="1"/>
+            <stop offset="60%" stop-color="#5a7fff" stop-opacity="0.9"/>
+            <stop offset="100%" stop-color="#2f0f3a" stop-opacity="0.3"/>
+          </radialGradient>
+          <linearGradient id="g2" x1="0" x2="1">
+            <stop offset="0" stop-color="#00f0ff"/>
+            <stop offset="1" stop-color="#ff3ac2"/>
+          </linearGradient>
+          <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="6" result="coloredBlur"/>
+            <feMerge>
+              <feMergeNode in="coloredBlur"/>
+              <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+          </filter>
+        </defs>
 
-    <!-- outer eyelid ring -->
-    <path d="M32 256 C96 112, 416 112, 480 256 C416 400, 96 400, 32 256 Z"
-          fill="url(#g1)" stroke="url(#g2)" stroke-width="6" filter="url(#glow)" opacity="0.98"/>
-    <!-- iris network -->
-    <g transform="translate(256,256)">
-      <circle r="80" fill="#03161b" />
-      <circle r="66" fill="url(#g2)" opacity="0.12" />
-      <!-- tech mesh -->
-      <g stroke="#7ee9ff" stroke-opacity="0.12" stroke-width="1">
-        <path d="M-50,-10 L50,10 M-30,-50 L30,50 M-60,0 L60,0 M-10,-60 L10,60" />
-      </g>
-      <!-- pupil -->
-      <circle r="30" fill="#001118" stroke="#66f0ff" stroke-opacity="0.22" stroke-width="2"/>
-      <circle r="10" cx="-8" cy="-6" fill="#bff8ff" opacity="0.9"/>
-    </g>
-  </svg>
+        <!-- outer eyelid ring -->
+        <path d="M32 256 C96 112, 416 112, 480 256 C416 400, 96 400, 32 256 Z"
+              fill="url(#g1)" stroke="url(#g2)" stroke-width="6" filter="url(#glow)" opacity="0.98"/>
+        <!-- iris network -->
+        <g transform="translate(256,256)">
+          <circle r="80" fill="#03161b" />
+          <circle r="66" fill="url(#g2)" opacity="0.12" />
+          <!-- tech mesh -->
+          <g stroke="#7ee9ff" stroke-opacity="0.12" stroke-width="1">
+            <path d="M-50,-10 L50,10 M-30,-50 L30,50 M-60,0 L60,0 M-10,-60 L10,60" />
+          </g>
+          <!-- pupil -->
+          <circle r="30" fill="#001118" stroke="#66f0ff" stroke-opacity="0.22" stroke-width="2"/>
+          <circle r="10" cx="-8" cy="-6" fill="#bff8ff" opacity="0.9"/>
+        </g>
+      </svg>
 
-  <div class="brand-title">OCULAIRE</div>
-  <div class="brand-sub">AI-Powered Glaucoma Detection Dashboard</div>
-</div>
-
-<script>
-  (function() {
-    const svg = document.querySelector('.tech-eye-svg');
-    if (svg) {
-      svg.setAttribute('tabindex', '0');
-      svg.setAttribute('role', 'button');
-      svg.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          window.location.search = '?page=dashboard';
-        }
-      });
-    }
-  })();
-</script>
-"""
-st.markdown(header_html, unsafe_allow_html=True)
+      <div class="brand-title">OCULAIRE</div>
+      <div class="brand-sub">AI-Powered Glaucoma Detection Dashboard</div>
+    </div>
+    """, unsafe_allow_html=True
+)
 
 # -----------------------
-# Helpers: models, preprocess, compute maps
+# Helpers: load models, preprocess, compute maps
 # -----------------------
 @st.cache_resource
 def load_bscan_model():
     try:
-        return tf.keras.models.load_model("bscan_cnn.h5", compile=False)
+        m = tf.keras.models.load_model("bscan_cnn.h5", compile=False)
+        return m
     except Exception:
         return None
 
@@ -244,11 +227,14 @@ with canvas_col:
 
     st.markdown("<div style='height:18px'></div>", unsafe_allow_html=True)
 
+    # Placeholders for the big RNFLT area and Grad-CAM next to each other
     viz_left, viz_right = st.columns([2.6, 2.4], gap="large")
     with viz_left:
+        # big RNFLT visual area (main figure will appear here immediately after prediction)
         st.markdown("<div class='kpi' style='min-height:420px; display:flex; flex-direction:column; padding:18px;'>", unsafe_allow_html=True)
         st.markdown("<div class='large-title'>RNFLT Visual</div>", unsafe_allow_html=True)
         rnflt_display = st.empty()
+        # small area reserved for thumbnails (will be filled immediately after main fig)
         thumb_area = st.empty()
         st.markdown("</div>", unsafe_allow_html=True)
     with viz_right:
@@ -284,8 +270,26 @@ with right_col:
 # Load models & artifacts (cached)
 # -----------------------
 with st.spinner("Loading models and artifacts (if available)..."):
-    b_model = load_bscan_model()
-    scaler, kmeans, avg_healthy, avg_glaucoma, thin_cluster, thick_cluster = load_rnflt_artifacts()
+    @st.cache_resource
+    def _load_b():
+        try:
+            return tf.keras.models.load_model("bscan_cnn.h5", compile=False)
+        except Exception:
+            return None
+    b_model = _load_b()
+
+    @st.cache_resource
+    def _load_rn():
+        try:
+            scaler = joblib.load("rnflt_scaler.joblib")
+            kmeans = joblib.load("rnflt_kmeans.joblib")
+            avg_healthy = np.load("avg_map_healthy.npy")
+            avg_glaucoma = np.load("avg_map_glaucoma.npy")
+            thick_cluster, thin_cluster = (1,0) if np.nanmean(avg_healthy) > np.nanmean(avg_glaucoma) else (0,1)
+            return scaler, kmeans, avg_healthy, avg_glaucoma, thin_cluster, thick_cluster
+        except Exception:
+            return None, None, None, None, None, None
+    scaler, kmeans, avg_healthy, avg_glaucoma, thin_cluster, thick_cluster = _load_rn()
 time.sleep(0.12)
 
 if "history" not in st.session_state:
@@ -408,6 +412,7 @@ if predict:
         if PLOTLY and isinstance(rnflt_fig, tuple):
             main_fig, fig_diff, fig_risk = rnflt_fig
             rnflt_display.plotly_chart(main_fig.update_layout(height=520), use_container_width=True)
+            # thumbnails under main
             cols = thumb_area.columns([1,1,1], gap="small")
             with cols[0]:
                 st.plotly_chart(main_fig.update_layout(height=260), use_container_width=True)
@@ -419,6 +424,7 @@ if predict:
                 st.plotly_chart(fig_risk.update_layout(height=260), use_container_width=True)
                 st.markdown("<div class='thumb-caption'>Risk Map (Thinner Zones)</div>", unsafe_allow_html=True)
         else:
+            # Matplotlib large 1x3 figure
             rnflt_display.pyplot(rnflt_fig)
             try:
                 c0, c1, c2 = thumb_area.columns([1,1,1], gap="small")
@@ -485,7 +491,7 @@ if predict:
         st.markdown(f'<a href="data:application/pdf;base64,{b64pdf}" download="oculaire_report.pdf" class="muted">Download PDF Report</a>', unsafe_allow_html=True)
 
 # -----------------------
-# If not predicting, show history summary
+# If not predicting, show history summary on the right
 # -----------------------
 if not predict:
     lines = []
